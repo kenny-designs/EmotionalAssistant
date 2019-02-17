@@ -92,6 +92,13 @@ ul {
     display: none;
 }
 
+.feedbackArea {
+    position: absolute;
+    bottom: 8vh;
+    text-align: center;
+    width: 100%;
+}
+
 /* Font */
 
 .messages {

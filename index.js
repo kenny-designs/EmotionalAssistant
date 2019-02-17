@@ -22,11 +22,16 @@ io.on('connection', (socket) => {
     // when the client emits 'new message', this listens and executes
     socket.on('new message', (data) => {
         // we tell the client to execute 'new message'
-        console.log("heLLO");
+        // var $feedbackMessage = $('.feedback');
+        // $feedbackMessage.text(data.intent ? data.intent[0].value : "asfetad");
         socket.broadcast.emit('new message', {
             username: socket.username,
             message: data
         });
+    });
+
+    socket.on('new intent', (message, intent) => {
+        socket.broadcast.emit('intent change', message, intent);
     });
 
     // when the client emits 'add user', this listens and executes

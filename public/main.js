@@ -12,6 +12,7 @@ $(function() {
     var $usernameInput = $('.usernameInput'); // Input for username
     var $messages = $('.messages');           // Messages area
     var $inputMessage = $('.inputMessage');   // Input message input box
+    var $feedbackMessage = $('.feedback');
 
     var $loginPage = $('.login.page');  // The login page
     var $chatPage = $('.chat.page');    // The chatroom page
@@ -73,14 +74,13 @@ $(function() {
             // consult Wit.ai for an emotion given the message
             let emotion = await queryEmotion(message);
             let { intent, sentiment } = emotion.entities;
+            socket.emit('new intent', message, intent);
 
             $inputMessage.val('');
-            addChatMessage({ username, message });
+            addChatMessage({ username, message, intent });
 
             // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', message + " " +
-                (intent[0].value != message ? "<p style='color: antiquewhite'>" + intent[0].value + " " : "" ) +
-            " " + ((sentiment) ? sentiment[0].value : "" ));
+            socket.emit('new message', message, intent);
         }
     };
 
@@ -245,7 +245,7 @@ $(function() {
     socket.on('login', (data) => {
         connected = true;
         // Display the welcome message
-        var message = "Welcome to Socket.IO Chat – ";
+        var message = "Emotional Assistant";
         log(message, {
             prepend: true
         });
@@ -293,5 +293,10 @@ $(function() {
 
     socket.on('reconnect_error', () => {
         log('attempt to reconnect has failed');
+    });
+
+    socket.on('intent change', (message, intent) => {
+        $feedbackMessage.text(intent && intent[0].value != message ? intent[0].value
+            : "");
     });
 });
