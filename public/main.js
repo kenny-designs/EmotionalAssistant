@@ -1,3 +1,5 @@
+
+
 $(function() {
     var FADE_TIME = 150; // ms
     var TYPING_TIMER_LENGTH = 400; // ms
@@ -18,7 +20,6 @@ $(function() {
     var $chatPage = $('.chat.page');    // The chatroom page
 
     // Public client token to Wit.ai
-    const CLIENT_TOKEN = 'LOWU5GDMZEHSUAZ3FEOACQY6ORMQEW3O';
 
     // Prompt for setting a username
     var username;
@@ -29,24 +30,26 @@ $(function() {
 
     var socket = io();
 
+
+
     // Query Wit.ai for an emotion relating to the given message
-    const queryEmotion = async msg => {
-      const uri = 'https://api.wit.ai/message?q=' + encodeURIComponent(msg);
-      const auth = 'Bearer ' + CLIENT_TOKEN;
-      const res = await fetch(uri, {headers: {Authorization: auth}});
+    // const queryEmotion = async msg => {
+    //   const uri = 'https://api.wit.ai/message?q=' + encodeURIComponent(msg);
+    //   const auth = 'Bearer ' + CLIENT_TOKEN;
+    //   const res = await fetch(uri, {headers: {Authorization: auth}});
+    //
+    //   return await res.json();
+    // };
 
-      return await res.json();
-    };
-
-    const addParticipantsMessage = (data) => {
-        var message = '';
-        if (data.numUsers === 1) {
-            message += "there's 1 participant";
-        } else {
-            message += "there are " + data.numUsers + " participants";
-        }
-        log(message);
-    }
+    // const addParticipantsMessage = (data) => {
+    //     var message = '';
+    //     if (data.numUsers === 1) {
+    //         message += "there's 1 participant";
+    //     } else {
+    //         message += "there are " + data.numUsers + " participants";
+    //     }
+    //     log(message);
+    // }
 
     // Sets the client's username
     const setUsername = () => {
@@ -72,15 +75,15 @@ $(function() {
         // if there is a non-empty message and a socket connection
         if (message && connected) {
             // consult Wit.ai for an emotion given the message
-            let emotion = await queryEmotion(message);
-            let { intent, sentiment } = emotion.entities;
-            socket.emit('new intent', message, intent);
+            // let emotion = await queryEmotion(message);
+            // let { intent, sentiment } = emotion.entities;
+            //socket.emit('new intent', message, intent);
 
             $inputMessage.val('');
-            addChatMessage({ username, message, intent });
+            addChatMessage({ username, message});
 
             // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', message, intent);
+            socket.emit('new message', message);
         }
     };
 
@@ -249,7 +252,7 @@ $(function() {
         log(message, {
             prepend: true
         });
-        addParticipantsMessage(data);
+        // addParticipantsMessage(data);
     });
 
     // Whenever the server emits 'new message', update the chat body
@@ -260,13 +263,13 @@ $(function() {
     // Whenever the server emits 'user joined', log it in the chat body
     socket.on('user joined', (data) => {
         log(data.username + ' joined');
-        addParticipantsMessage(data);
+        // addParticipantsMessage(data);
     });
 
     // Whenever the server emits 'user left', log it in the chat body
     socket.on('user left', (data) => {
         log(data.username + ' left');
-        addParticipantsMessage(data);
+        // addParticipantsMessage(data);
         removeChatTyping(data);
     });
 
@@ -296,7 +299,7 @@ $(function() {
     });
 
     socket.on('intent change', (message, intent) => {
-        $feedbackMessage.text(intent && intent[0].value != message ? intent[0].value
-            : "");
+        $feedbackMessage.text(JSON.parse(intent).emotion.emotion);
+        console.log(intent);
     });
 });

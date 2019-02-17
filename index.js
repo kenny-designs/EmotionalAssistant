@@ -5,6 +5,10 @@ var path = require('path');
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3001;
+const pd = require('paralleldots');
+pd.apiKey = 'CslqOaTfQnQ0SY8fO2suPrFlnGjH1TH75Tfp3TtL9yA';
+
+
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
@@ -18,12 +22,24 @@ var numUsers = 0;
 
 io.on('connection', (socket) => {
     var addedUser = false;
+    let responseOuter;
 
     // when the client emits 'new message', this listens and executes
     socket.on('new message', (data) => {
         // we tell the client to execute 'new message'
-        // var $feedbackMessage = $('.feedback');
-        // $feedbackMessage.text(data.intent ? data.intent[0].value : "asfetad");
+
+        pd.emotion(data,"en")
+            .then((response) => {
+                console.log(response);
+                responseOuter = response;
+            })
+            .then((e) => {
+                socket.broadcast.emit('intent change', data, responseOuter);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
         socket.broadcast.emit('new message', {
             username: socket.username,
             message: data
