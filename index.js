@@ -22,6 +22,7 @@ io.on('connection', (socket) => {
     // when the client emits 'new message', this listens and executes
     socket.on('new message', (data) => {
         // we tell the client to execute 'new message'
+        console.log("heLLO");
         socket.broadcast.emit('new message', {
             username: socket.username,
             message: data

@@ -17,7 +17,7 @@ $(function() {
     var $chatPage = $('.chat.page');    // The chatroom page
 
     // Public client token to Wit.ai
-    const CLIENT_TOKEN = 'X6W62OX6DMFCXUCPK7BFMR23E3FPCNPU';
+    const CLIENT_TOKEN = 'LOWU5GDMZEHSUAZ3FEOACQY6ORMQEW3O';
 
     // Prompt for setting a username
     var username;
@@ -72,14 +72,17 @@ $(function() {
         if (message && connected) {
             // consult Wit.ai for an emotion given the message
             let emotion = await queryEmotion(message);
+            let { intent, sentiment } = emotion.entities;
 
             $inputMessage.val('');
-            addChatMessage({ username, message, emotion });
+            addChatMessage({ username, message });
 
             // tell server to execute 'new message' and send along one parameter
-            socket.emit('new message', message);
+            socket.emit('new message', message + " " +
+                (intent[0].value != message ? "<p style='color: antiquewhite'>" + intent[0].value + " " : "" ) +
+            " " + ((sentiment) ? sentiment[0].value : "" ));
         }
-    }
+    };
 
     // Log a message
     const log = (message, options) => {
