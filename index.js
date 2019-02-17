@@ -14,7 +14,6 @@ server.listen(port, () => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Chatroom
-
 var numUsers = 0;
 
 io.on('connection', (socket) => {

@@ -10,11 +10,14 @@ $(function() {
     // Initialize variables
     var $window = $(window);
     var $usernameInput = $('.usernameInput'); // Input for username
-    var $messages = $('.messages'); // Messages area
-    var $inputMessage = $('.inputMessage'); // Input message input box
+    var $messages = $('.messages');           // Messages area
+    var $inputMessage = $('.inputMessage');   // Input message input box
 
-    var $loginPage = $('.login.page'); // The login page
-    var $chatPage = $('.chat.page'); // The chatroom page
+    var $loginPage = $('.login.page');  // The login page
+    var $chatPage = $('.chat.page');    // The chatroom page
+
+    // Public client token to Wit.ai
+    const CLIENT_TOKEN = 'X6W62OX6DMFCXUCPK7BFMR23E3FPCNPU';
 
     // Prompt for setting a username
     var username;
@@ -24,6 +27,15 @@ $(function() {
     var $currentInput = $usernameInput.focus();
 
     var socket = io();
+
+    // Query Wit.ai for an emotion relating to the given message
+    const queryEmotion = async msg => {
+      const uri = 'https://api.wit.ai/message?q=' + encodeURIComponent(msg);
+      const auth = 'Bearer ' + CLIENT_TOKEN;
+      const res = await fetch(uri, {headers: {Authorization: auth}});
+
+      return await res.json();
+    };
 
     const addParticipantsMessage = (data) => {
         var message = '';
@@ -52,17 +64,18 @@ $(function() {
     }
 
     // Sends a chat message
-    const sendMessage = () => {
+    const sendMessage = async () => {
         var message = $inputMessage.val();
         // Prevent markup from being injected into the message
         message = cleanInput(message);
         // if there is a non-empty message and a socket connection
         if (message && connected) {
+            // consult Wit.ai for an emotion given the message
+            let emotion = await queryEmotion(message);
+
             $inputMessage.val('');
-            addChatMessage({
-                username: username,
-                message: message
-            });
+            addChatMessage({ username, message, emotion });
+
             // tell server to execute 'new message' and send along one parameter
             socket.emit('new message', message);
         }
@@ -278,5 +291,4 @@ $(function() {
     socket.on('reconnect_error', () => {
         log('attempt to reconnect has failed');
     });
-
 });
