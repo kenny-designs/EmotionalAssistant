@@ -1,5 +1,3 @@
-
-
 $(function() {
     var FADE_TIME = 150; // ms
     var TYPING_TIMER_LENGTH = 400; // ms
@@ -30,27 +28,6 @@ $(function() {
 
     var socket = io();
 
-
-
-    // Query Wit.ai for an emotion relating to the given message
-    // const queryEmotion = async msg => {
-    //   const uri = 'https://api.wit.ai/message?q=' + encodeURIComponent(msg);
-    //   const auth = 'Bearer ' + CLIENT_TOKEN;
-    //   const res = await fetch(uri, {headers: {Authorization: auth}});
-    //
-    //   return await res.json();
-    // };
-
-    // const addParticipantsMessage = (data) => {
-    //     var message = '';
-    //     if (data.numUsers === 1) {
-    //         message += "there's 1 participant";
-    //     } else {
-    //         message += "there are " + data.numUsers + " participants";
-    //     }
-    //     log(message);
-    // }
-
     // Sets the client's username
     const setUsername = () => {
         username = cleanInput($usernameInput.val().trim());
@@ -74,11 +51,6 @@ $(function() {
         message = cleanInput(message);
         // if there is a non-empty message and a socket connection
         if (message && connected) {
-            // consult Wit.ai for an emotion given the message
-            // let emotion = await queryEmotion(message);
-            // let { intent, sentiment } = emotion.entities;
-            //socket.emit('new intent', message, intent);
-
             $inputMessage.val('');
             addChatMessage({ username, message});
 
