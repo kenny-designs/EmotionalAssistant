@@ -15,6 +15,7 @@ $(function() {
     var $messages = $('.messages');           // Messages area
     var $inputMessage = $('.inputMessage');   // Input message input box
     var $feedbackMessage = $('.feedback');
+    var $movingGradient = $('.moving-gradient');
 
     var $loginPage = $('.login.page');  // The login page
     var $chatPage = $('.chat.page');    // The chatroom page
@@ -299,7 +300,13 @@ $(function() {
     });
 
     socket.on('intent change', (message, intent) => {
-        $feedbackMessage.text(JSON.parse(intent).emotion.emotion);
-        console.log(intent);
+        let emotion = JSON.parse(intent).emotion.emotion;
+
+        $feedbackMessage.text(emotion);
+
+        emotion = emotion.toLowerCase();
+
+        $movingGradient.removeClass('happy sad angry excited bored fear');
+        $movingGradient.addClass(emotion);
     });
 });
